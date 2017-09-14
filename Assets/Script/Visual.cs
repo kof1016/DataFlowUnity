@@ -2,114 +2,75 @@
  * 模擬視覺端，先QueryNotifier<對應功能的介面>，掛上事件，取得結果顯示於畫面
  * sample如下
  */
+
+using System;
+using System.Collections.Generic;
+
 using DataDefine;
 
-using Library.Framework;
-using Library.Synchronize;
+using GameLogic.Play;
 
-using Regulus.Utility;
-
-using Synchronization.Interface;
-
-using IUpdatable = Library.Utility.IUpdatable;
+using UnityEngine;
 
 namespace Script
 {
-    public class Visual : IUpdatable
+    public class Visual : MonoBehaviour
     {
-        private readonly IGhostQuerier _GhostQuerier;
-        private readonly Command _Command;
-        private Regulus.Utility.Console.IViewer _Viewer;
+        //private Move _Move;
 
-        public Visual(IGhostQuerier ghost_querier,
-                      Command command,
-                      Regulus.Utility.Console.IViewer viewer)
+        private IInput _Input;
+
+        private List<Player> _Players;
+
+        public GameObject PlayerPrefab;
+        private void Start()
         {
-            _GhostQuerier = ghost_querier;
-            _Command = command;
-            _Viewer = viewer;
+            _Players = new List<Player>();
+          //  _Move = new DataDefine.Move();
+
+            Entry.GetQuerier().QueryNotifier<IPlayer>().Supply += CreatePlayer;
+            Entry.GetQuerier().QueryNotifier<IInput>().Supply += PlayerInput;
         }
 
-        void IBootable.Launch()
+        private void CreatePlayer(IPlayer obj)
         {
-            _Command.Register(
-                              "start",
-                              () =>
-                                  {
-                                      _GhostQuerier.QueryNotifier<IVerify>().Supply += _SupplyVerify;
-                                      _GhostQuerier.QueryNotifier<IMove>().Supply += _SupplyMove;
-                                  });
-        }
-
-        private void _Add(int result)
-        {
-            _Viewer.WriteLine($"result = {result}");
-        }
-
-        void IBootable.Shutdown()
-        {
-            _Shutdown();
-        }
-
-        private void _Shutdown()
-        {
-            _GhostQuerier.QueryNotifier<IVerify>().Supply -= _SupplyVerify;
-            _GhostQuerier.QueryNotifier<IVerify2>().Supply -= _SupplyVerify2;
-        }
-
-        private void _SupplyVerify2(IVerify2 obj)
-        {
-            var result = obj.Login("1", "1");
-        }
-
-        private void _SupplyVerify(IVerify obj)
-        {
-            // command 使用方法2
-            _Command.RegisterLambda<IVerify, string, string, Value<bool>>
-                    (
-                     obj,
-                     (instance, a1, a2) => instance.Login(a1, a2),
-                     result => { _Viewer.WriteLine($"回傳{result}"); });
-
-
-            //_Command.Register("Login []", () => _Login(obj));
-
+            var instance = GameObject.Instantiate(PlayerPrefab);
             
-        }
+            var playerComponent = instance.GetComponent<Player>();
 
-        private void _SupplyMove(IMove obj)
-        {
-            _Command.RegisterLambda(this, instance => instance.Walk());
-
+            playerComponent.SetPlayer(obj);
             
+            // create prefab instance
+
+            //obj.MoveEvent += (move) => { _Move = move; };
         }
 
-        private void Walk()
+        private void PlayerInput(IInput input)
         {
-            _Viewer.WriteLine("visual walking");
+            _Input = input;
         }
 
-        private void _LoginA(string a, string b)
+        private void Update()
         {
+            if(_Input == null)
+            {
+                return;
+            }
 
+            if (Input.GetKeyUp(KeyCode.W))
+            {
+                _Input.OpCode("Forward");
+            }
+            else if(Input.GetKeyUp(KeyCode.Space))
+            {
+                _Input.OpCode("Stop");
+            }
         }
 
-
-        private void _Login(IVerify obj)
+        private void OnDestroy()
         {
-            var result = obj.Login("1", "1");
-            result.OnValueEvent += res =>
-                {
-                    if (res)
-                    {
-                        // login ok
-                    }
-                };
-        }
-
-        bool IUpdatable.Update()
-        {
-            return true;
+            Entry.GetQuerier().QueryNotifier<IInput>().Supply -= PlayerInput;
+            Entry.GetQuerier().QueryNotifier<IPlayer>().Supply -= CreatePlayer;
         }
     }
 }

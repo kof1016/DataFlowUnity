@@ -5,7 +5,7 @@
     
     namespace DataDefine.Ghost 
     { 
-        public class CIVerify : DataDefine.IVerify, Library.Synchronize.IGhost
+        public class CIPlayer : DataDefine.IPlayer, Library.Synchronize.IGhost
         {
             private event Library.Synchronize.CallMethodCallback _OnCallMethodEvent;
             
@@ -21,7 +21,7 @@
 
             readonly Type _GhostType;
 
-            public CIVerify(Guid id, Type ghost_type, bool have_return )
+            public CIPlayer(Guid id, Type ghost_type, bool have_return )
             {
                 _HaveReturn = have_return ;
                 _GhostIdName = id;            
@@ -49,14 +49,49 @@
             }
             
             
-                Library.Synchronize.Value<System.Boolean> DataDefine.IVerify.Login(System.String _1,System.String _2)
-                {                    
-                     var returnValue = new Library.Synchronize.Value<System.Boolean>();
-                    var info = typeof(DataDefine.IVerify).GetMethod("Login");
-                    _OnCallMethodEvent(info , new object[] {_1 ,_2} , returnValue);                    
-                    return returnValue;
+
+
+                System.Action<DataDefine.Move> _MoveEvent;
+                
+                event System.Action<DataDefine.Move> DataDefine.IPlayer.MoveEvent
+                {
+                    add { _MoveEvent += value;}
+                    remove { _MoveEvent -= value;}
                 }
-
-
         }
     }
+
+            using System;  
+            using System.Collections.Generic;
+    
+            namespace DataDefine.Event.IPlayer 
+            { 
+                public class MoveEvent : Synchronization.IEventProxyCreator
+                {
+                    Type _Type;
+                    string _Name;
+            
+                    public MoveEvent()
+                    {
+                        _Name = "MoveEvent";
+                        _Type = typeof(DataDefine.IPlayer);                   
+            
+                    }
+    
+                    Delegate Synchronization.IEventProxyCreator.Create(Guid soul_id, int event_id, Synchronization.InvokeEventCallback invoke_event)
+                    {                
+                        var closure = new Synchronization.GenericEventClosure<DataDefine.Move>(soul_id, event_id, invoke_event);                
+                        return new Action<DataDefine.Move>(closure.Run);
+                    }
+        
+                    Type Synchronization.IEventProxyCreator.GetType()
+                    {
+                        return _Type;
+                    }            
+
+                    string Synchronization.IEventProxyCreator.GetName()
+                    {
+                        return _Name;
+                    }            
+                }
+            }

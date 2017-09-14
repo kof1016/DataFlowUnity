@@ -15,7 +15,7 @@ using Synchronization.Interface;
 
 namespace Script
 {
-    internal class Logic : IUpdatable, IVerify, IMove
+    internal class Logic : IUpdatable, IVerify
     {
         private readonly ISoulBinder _Binder;
 
@@ -30,17 +30,13 @@ namespace Script
             _Connector = connector;
         }
 
-        void IMove.Walk()
-        {
-            _Viewer.WriteLine("logic walk");
-        }
 
         void IBootable.Launch()
         {
             _Viewer.WriteLine("\nTerry Test");
 
             _Binder.Bind<IVerify>(this);
-            _Binder.Bind<IMove>(this);
+
 
             
         }
@@ -48,7 +44,7 @@ namespace Script
         void IBootable.Shutdown()
         {
             _Binder.Unbind<IVerify>(this);
-            _Binder.Unbind<IMove>(this);
+
         }
 
         bool IUpdatable.Update()
