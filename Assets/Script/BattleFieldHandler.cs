@@ -40,13 +40,17 @@ namespace Script
 
         void IBootable.Launch()
         {
-            _Viewer.WriteLine("Battle Start.");
+            _Viewer.WriteLine("Battle Start1.");
             ((IUpdatable)_Center).Launch();
+            _Viewer.WriteLine("Battle Start2.");
             _Battle.Start(this, this, new TurnBuffer<ITurn>(30000));
+            _Viewer.WriteLine("Battle Start3.");
             _Command.RegisterLambda<BattleFieldHandler, string>(this, (ins, op) => ins._Send(op));
+            _Viewer.WriteLine("Battle Start4.");
 
-            foreach(var record in _Battle.GetRecords())
+            foreach (var record in _Battle.GetRecords())
             {
+                
                 bool mainPlayer = record.Player == _Battle.GetOwner();
                 _Center.JoinPlayer(record.Player, _Battle.GetOwnerCharactor(), mainPlayer);
             }

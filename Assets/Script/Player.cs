@@ -2,6 +2,8 @@
 
 using UnityEngine;
 
+using UnityStandardAssets.Utility;
+
 namespace Script
 {
     public class Player : MonoBehaviour
@@ -27,7 +29,15 @@ namespace Script
         public void SetPlayer(IPlayer player)
         {
             _Player = player;
-            player.MoveEvent += Player_MoveEvent;      
+            
+            player.MoveEvent += Player_MoveEvent;
+
+            player.IsMain().OnValueEvent += (result) =>
+                {
+                    if(result)
+                        Object.FindObjectOfType<FollowTarget>().target = transform;
+                };
+                
         }
 
         private void Player_MoveEvent(Move move)

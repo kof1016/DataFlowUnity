@@ -36,6 +36,7 @@ namespace Script
 
         public Entry()
         {
+            Debug.Log("Entry construor");
             _Updater = new Updater();
             _Connector = new Connector(new Protocol());
 
@@ -44,6 +45,7 @@ namespace Script
 
         public void Start()
         {
+            Debug.Log("Entry start ");
             _Command = Console.Command;
             _Viewer = Console;
 
@@ -115,6 +117,7 @@ namespace Script
 
         private void Update()
         {
+            
             _Connector.Agent.Update();
             _Updater.Working();
             

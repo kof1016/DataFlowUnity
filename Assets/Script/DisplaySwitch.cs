@@ -16,11 +16,20 @@ namespace Script
             Target.enabled = Show;
         }
 
+        private void OnGUI()
+        {
+            if(GUILayout.Button("按"))
+            {
+                Show = !Show;
+            }
+        }
+
         // Update is called once per frame
         private void Update()
         {
-            if(Input.GetKeyUp(Key))
+            if(Input.GetKeyDown(Key))
             {
+               Debug.Log("按~");
                 Show = !Show;
             }
 

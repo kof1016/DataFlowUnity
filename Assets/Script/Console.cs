@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Regulus.Utility;
 
@@ -70,7 +71,7 @@ namespace Script
         // Use this for initialization
         private void Start()
         {
-           // Singleton<Log>.Instance.RecordEvent += _WriteLine;
+           //Singleton<Log>.Instance.RecordEvent += _WriteLine;
         }
 
         private void OnGUI()
@@ -125,6 +126,8 @@ namespace Script
 
         private void _WriteLine(string text)
         {
+            
+
             _Messages.Enqueue(_LastMessage + text);
             if(_Messages.Count > Console._MaxLineCounts)
             {

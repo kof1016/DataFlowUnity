@@ -50,6 +50,9 @@
             
             
 
+                System.Boolean _Main;
+
+                System.Boolean DataDefine.IPlayer.Main { get{ return _Main;} }
 
                 System.Action<DataDefine.Move> _MoveEvent;
                 
@@ -66,7 +69,7 @@
     
             namespace DataDefine.Event.IPlayer 
             { 
-                public class MoveEvent : Synchronization.IEventProxyCreator
+                public class MoveEvent : Synchronization.Interface.IEventProxyCreator
                 {
                     Type _Type;
                     string _Name;
@@ -78,18 +81,18 @@
             
                     }
     
-                    Delegate Synchronization.IEventProxyCreator.Create(Guid soul_id, int event_id, Synchronization.InvokeEventCallback invoke_event)
+                    Delegate Synchronization.Interface.IEventProxyCreator.Create(Guid soul_id, string event_id, Synchronization.PreGenerated.InvokeEventCallback invoke_event)
                     {                
-                        var closure = new Synchronization.GenericEventClosure<DataDefine.Move>(soul_id, event_id, invoke_event);                
+                        var closure = new Synchronization.PreGenerated.GenericEventClosure<DataDefine.Move>(soul_id, event_id, invoke_event);                
                         return new Action<DataDefine.Move>(closure.Run);
                     }
         
-                    Type Synchronization.IEventProxyCreator.GetType()
+                    Type Synchronization.Interface.IEventProxyCreator.GetType()
                     {
                         return _Type;
                     }            
 
-                    string Synchronization.IEventProxyCreator.GetName()
+                    string Synchronization.Interface.IEventProxyCreator.GetName()
                     {
                         return _Name;
                     }            
